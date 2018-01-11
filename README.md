@@ -19,7 +19,9 @@
 会把竞猜模块的流程详细的给附上,日后对于类似活动可以参考下，算是总结
 
 先上个流程图,第一次画流程图,真是失败...勉强看下,
-![流程图] (https://github.com/JoPure/merryChirsmas/blob/master/merryChirs/readmeImg/readPic_1_2.png)
+![流程图](https://github.com/JoPure/merryChirsmas/blob/master/merryChirs/readmeImg/readPic_1_2.png)
+
+![截图](https://github.com/JoPure/merryChirsmas/blob/master/merryChirs/readmeImg/readPic_1_1.png)
 
 
 # 分解
