@@ -102,7 +102,7 @@ function guessInfoActivity() {
 ```
 
 
-#### 补充
+#### 1(1)、补充
 怕回头再看会忘记，所以这里把上面的for循环说明下缘由，
 
 > 这里是个二维数组 , i 是期数, k 是竞猜个数
@@ -276,7 +276,7 @@ function getGuessAward() {
 ```
 
 
-### 3、查询竞猜历史
+### 3、查询竞猜历史并查看竞猜中奖历史
 
 ```javascript
 //竞猜 查竞猜历史
@@ -314,10 +314,75 @@ function guessGetHistory() {
 
 ```
 
+```javascript
+//点击查看获取竞猜期数历史奖励
+$(".lookAward-ul ul li").on("click", function () {
+    $(".lookAward-ul ul li.active").removeClass("active");
+    $(".lookAwardbox p.tip-desc").hide();
+    $(".lookAward-ul").addClass('top');
+    $(this).addClass("active");
+    var index = $(this).index();  //3
+    console.log(pg_config.data.shutNum);
+    var flag = false;
+    var num = 0;
+    for (var i = 0; i < pg_config.data.guessHis.length; i++) {
+        if (pg_config.data.guessHis[i].extInfo.step == index) {
+            flag = true;
+            num = i;
+            break;
+        }
+    }
+    if (flag) {
+        switch (pg_config.data.shutNum[index]) {  //3
+            case 3:
+                $(".lookAwardbox p.code").text(pg_config.data.guessHis[num].cdKeys).show();
+                $(".lookAwardbox div").removeClass("award-img-1 award-img-2 award-img-3").addClass("award-img-3").show();
+                break;
+            case 4:
+                $(".lookAwardbox p.code").text(pg_config.data.guessHis[num].cdKeys).show();
+                $(".lookAwardbox div").removeClass("award-img-1 award-img-2 award-img-3").addClass("award-img-2").show();
+                break;
+            case 5:
+                $(".lookAwardbox p.code").text(pg_config.data.guessHis[num].cdKeys).show();
+                $(".lookAwardbox div").removeClass("award-img-1 award-img-2 award-img-3").addClass("award-img-1").show();
+                break;
+            default:
+                $(".lookAwardbox div").removeClass("award-img-1 award-img-2 award-img-3").hide();
+                var tips = pg_config.tip.tip3;
+                for (var i = 0; i < 10; i++) {
+                    if (guessArr && guessArr[index] && guessArr[index][i] > 1) {
+                        tips = pg_config.tip.tip6
+                    }
+                }
+                $(".lookAwardbox p.code").empty();
+                $(".lookAwardbox p.tip-desc").text(tips).show();
+                break;
+        }
+    }
+    else {
+        var vflag = false;
+        //循环长度,如果分数大于1的，说明我选了也系统出结果了,但是可能没中奖或者我没有领取奖励
+        for (var k = 0; k < guessArr[index].length; k++) {
+            if (guessArr[index][k] > 1) {
+                vflag = true;
+            }
+        }
+        $(".lookAwardbox div").removeClass("award-img-1 award-img-2 award-img-3").hide();
+        $(".lookAwardbox p.code").empty();
+        if (vflag) {
+            $(".lookAwardbox p.tip-desc").text('Chưa trúng giải').show();
+        } else {
+            $(".lookAwardbox p.tip-desc").text('Đợt này chưa công bố kết quà hoặc chưa nhận code hoặc chưa trúng giải').show();
+        }
+    }
+});
 
-#### 补充
+```
+
+
+#### 3(1)、补充
 > shutNum是分数
-会把各期竞猜情况进行分数统计，后面我们会用到这个参数查询玩家的历史获奖奖励图片
+会把各期竞猜情况进行分数统计，后面我们会用到这个参数，在查看中奖历史时，这个分数会帮助我们分清玩家的历史获奖奖励图片
 `注意：我们的奖励图片是不一样的，5中3,5中4,5中5不同的三张图`
 
 ```javascript
@@ -405,7 +470,7 @@ $(".menu-bar ul li").on("click", function () {
 
 ```
 
-#### 对应期数竞猜代码说明
+#### 4(1)、对应期数竞猜代码说明
 
 > 循环查询
 guessArr[index][i] 第index期的10只都查询
