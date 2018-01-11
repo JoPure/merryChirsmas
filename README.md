@@ -18,8 +18,8 @@
 竞猜模块纠结很久,这是运律陪加班敲的,现在想起来依旧觉得感动,我是实在不会，处于懵的状态,所以想着记录下来这次活动,
 会把竞猜模块的流程详细的给附上,日后对于类似活动可以参考下，算是总结
 
-
 先上个流程图,第一次画流程图,真是失败...勉强看下,
+![流程图] (https://github.com/JoPure/merryChirsmas/blob/master/merryChirs/readmeImg/readPic_1_2.png)
 
 
 # 分解
