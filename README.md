@@ -515,3 +515,148 @@ guessArr[index][i] 第index期的10只都查询
             $(".submitBtn").removeClass("guessAward_btn guessHaveAward_btn noAward_btn wait_btn");
         }
 ```
+
+
+### 重构
+因为第二次做这个专题然后我把一些类似的地方做了下重构,把一些相同的方法进行了封装，然后传入对应的参数后，
+整体看的时候感觉就美丽多了啦，贴代码先
+>领取奖励,查询历史,查询情况封装
+
+```javascript
+//领取奖励,查询历史,查询情况封装
+_checkAndclickAward = {
+    /**封装领取奖励
+     * @param e    当前dom
+     * @param clickDom_class
+     * @param actId  活动ID
+     * @param type
+     */
+    get_award_click: function (e, clickDom_class, actId, type) {
+        var rewardId = $(e).attr('data-rewardId');
+        var params = {
+            groupId: pg_config.data.groupId,
+            rewardId: rewardId,
+            actId: actId,
+            token: globalData.token
+        };
+        ajaxDataController(requestUrl.joinActivityUrl, params, function (result) {
+            // result = {"code": 200, "state": {"cdKeys": "14f9d109\r"}};
+            if (result.code == 200) {
+                awardTip(pg_config.tip.tip2, result.state.cdKeys);
+                if (type == 1) {
+                    $("." + clickDom_class).removeClass("getBtn").addClass("haveAwardBtn").off("click");
+                }
+                else {
+                    $("." + clickDom_class).removeClass("event4-btn").addClass("haveAwardBtn2").off("click");
+                }
+            }
+            else {
+                tip(pg_config.status[result.code]);
+            }
+        })
+    },
+    /**
+     * 封装查询历史领取情况
+     * @param actId
+     * @param histroyDom_class
+     * @param btn
+     * @param type
+     */
+    check_award_History: function (actId, histroyDom_class, btn, type) {
+        var params = {
+            actId: actId,
+            groupId: pg_config.data.groupId,
+            token: globalData.token
+        };
+        ajaxDataController(requestUrl.getHistroy, params, function (result) {
+            if (result.code == 200) {
+                if (type == 1) {
+                    resultFun(result, histroyDom_class, btn, "getBtn", "haveAwardBtn");
+                }
+                else if (type == 2) {
+                    resultFun(result, histroyDom_class, btn, "event4-btn", "haveAwardBtn2");
+                }
+                else {
+                    if (result.state.length > 0) {
+                        pg_config.data.guessHis = result.state;
+                    }
+                }
+            }
+            else {
+                tip(pg_config.status[result.code]);
+            }
+        })
+    },
+    check_info: function (actId, rewardId, type) {
+        var params = {
+            actId: actId,
+            groupId: pg_config.data.groupId,
+            rewardId: rewardId,
+            token: globalData.token
+        };
+        ajaxDataController(requestUrl.infoActivity, params, function (result) {
+            if (result.code == 200) {
+                if (type == 1) {
+                    var peopleNum = result.state.countTimes;
+                    $(".point-people span").text(peopleNum);
+                }
+                else {
+                    var PayCharge = result.state.PayCharge;
+                    $(".charge-money span").text(PayCharge);
+                }
+            }
+            else {
+                tip(pg_config.status[result.code]);
+            }
+        })
+    }
+};
+
+```
+
+完毕之后把原本初始化的地方调整了下，变成这样
+
+```javascript
+function initCheck() {
+    //日登陆 查奖励领取情况
+    _checkAndclickAward.check_award_History(pg_config.data.actId1, '.award-main-1', 'button.dayBtn', 1);
+    //活跃人数  查奖励领取情况
+    _checkAndclickAward.check_award_History(pg_config.data.actId3, ".award-main-3", "button.pointBtn", 1);
+    //累计充值 查奖励领取情况
+    _checkAndclickAward.check_award_History(pg_config.data.actId4, ".award-main-4", "button.event4Btn", 2);
+    //活跃人数 查当前到达人数
+    _checkAndclickAward.check_info(pg_config.data.actId3, '5a615156422ebf1530ae6c12', 1);
+    //充值金额 查询当前充值金额情况
+    _checkAndclickAward.check_info(pg_config.data.actId4, '5a615156422ebf1530ae6c17', 2);
+};
+```
+
+
+
+
+再把类似点击事件进行封装
+
+```javascript
+var action = function (e) {
+    $(e).on("click", function () {
+        if (isLogin() && isChoose()) {
+            var _this = $(this);
+            var testName = _this.attr('class').slice(-5);
+            var fatherBox = _this.parent().parent().parent();
+            var actId = fatherBox.attr('data-actId');
+            var type = fatherBox.attr('data-type');
+            _checkAndclickAward.get_award_click(_this, testName, actId, type);
+        }
+        else {
+            showBox(".login-form");
+        }
+    });
+};
+// 日登陆领取奖励
+action($(".dayBtn"));
+// 活跃人数领奖
+action($(".pointBtn"));
+// 累计充值领奖
+action($(".event4-btn"));
+
+```
